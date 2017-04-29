@@ -1,2 +1,2 @@
-# rate-my-wifi
-Rate My Wifi python script repository
+# Public Network Analyser
+Public Network Analyser python script repository
