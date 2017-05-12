@@ -1,7 +1,9 @@
 """ Class for network functions """
+# pylint: disable=W0702
 import socket
 # pip install dnspython
 import dns.resolver
+from libs.webtools import WebTools
 
 class NetRecon:
     """ Class for network functions """
@@ -20,10 +22,18 @@ class NetRecon:
     @staticmethod
     def get_external_ip():
         """ Grabs the external IP address """
-        # We will use the OpenDNS DNS server to grab our public IP
-        my_resolver = dns.resolver.Resolver()
-        my_resolver.nameservers = ['208.67.222.222']
-        answer = my_resolver.query('myip.opendns.com.')
-        # HTTP fallback on Akamai's CDN
-        # http://whatismyip.akamai.com/.
-        return answer[0].address
+        address = ""
+        try:
+            # We will first use the OpenDNS DNS server to grab our public IP
+            my_resolver = dns.resolver.Resolver()
+            my_resolver.timeout = 1
+            my_resolver.lifetime = 1
+            my_resolver.nameservers = ['208.67.222.222']
+            answer = my_resolver.query('myip.opendns.com.')
+            address = answer[0].address
+        except:
+            # HTTP fallback on Akamai's CDN
+            # http://whatismyip.akamai.com/
+            request = WebTools.get("http://whatismyip.akamai.com/")
+            address = str(request['response'])
+        return address
