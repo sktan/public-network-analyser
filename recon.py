@@ -5,16 +5,23 @@ from libs.netrecon import NetRecon
 # pip install pyspeedtest
 import pyspeedtest
 
-def print_os():
+def operating_system():
     """ Prints the OS to the console """
-    print("Current Operating System: {} {}".format(platform.system(), platform.release()))
+    os_string = "{} {}".format(platform.system(), platform.release())
+    print("Current Operating System: %s" % os_string)
+    return os_string
 
 def network_interface():
     """ Grabs the network interface information """
     net_out_ip = NetRecon.out_interface()
+    ext_ip = NetRecon.get_external_ip()
     print("LAN Address: {0}".format(net_out_ip))
-    print("External IP: {0}".format(NetRecon.get_external_ip()))
-    return None
+    print("External IP: {0}".format(ext_ip))
+    # Returns a dictionary with the internal + external IPs
+    return {
+        'external_ip': ext_ip,
+        'internal_ip': net_out_ip
+    }
 
 def speedtest():
     """ Runs a internet speedtest """
@@ -38,7 +45,9 @@ def main(args=None):
     if args is None:
         args = sys.argv[1:]
 
-    print_os()
+    network_stats = {}
+
+    operating_system()
     network_interface()
     speedtest()
 
