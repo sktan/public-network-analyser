@@ -1,5 +1,6 @@
 """ Class for Web functions """
 import urllib.request
+import urllib.parse
 
 class WebTools:
     """ Class for network functions """
@@ -7,6 +8,16 @@ class WebTools:
     def get(url, expected_response=200):
         """ Submits a GET request """
         response = urllib.request.urlopen(url)
+        retval = {}
+        retval['response'] = response.read()
+        if response.getcode() == expected_response:
+            retval['success'] = True
+        return retval
+    @staticmethod
+    def post(url, data, expected_response=200):
+        """ Submits a POST request """
+        post_data = urllib.parse.urlencode(data).encode('UTF-8')
+        response = urllib.request.urlopen(url, post_data)
         retval = {}
         retval['response'] = response.read()
         if response.getcode() == expected_response:
