@@ -40,15 +40,20 @@ def format_network_speed(raw_bps=0):
         speed /= 1024
     return "%0.2f %s" % (speed, fmt[index])
 
+def requires_captive_portal():
+    """ Determines whether a captive portal is required for this network """
+    cap_por_required = NetRecon.captive_portal_required()
+    print("Captive portal: {0}".format(cap_por_required))
+
 def main(args=None):
     """ The entry point of our script."""
     if args is None:
         args = sys.argv[1:]
 
     network_stats = {}
-
     operating_system()
     network_interface()
+    requires_captive_portal()
     speedtest()
 
 if __name__ == "__main__":

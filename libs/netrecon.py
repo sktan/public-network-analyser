@@ -35,5 +35,14 @@ class NetRecon:
             # HTTP fallback on Akamai's CDN
             # http://whatismyip.akamai.com/
             request = WebTools.get("http://whatismyip.akamai.com/")
-            address = str(request['response'])
-        return address
+            address = request['response']
+        return str(address)
+    @staticmethod
+    def captive_portal_required():
+        """ Determine if a captive portal login is required for this network """
+        # We will use the google endpoint below to look for a "NO CONTENT" HTTP status
+        url = "http://clients3.google.com/generate_204"
+        # If a 3xx or 200 response, we can determine that a captive portal is required
+        # https://www.chromium.org/chromium-os/chromiumos-design-docs/network-portal-detection
+        request = WebTools.get(url, expected_response=204)
+        return request['status'] != 204

@@ -10,7 +10,9 @@ class WebTools:
         response = urllib.request.urlopen(url)
         retval = {}
         retval['response'] = response.read()
-        if response.getcode() == expected_response:
+        retval['status'] = response.getcode()
+        retval['success'] = False
+        if retval['status'] == expected_response:
             retval['success'] = True
         return retval
     @staticmethod
@@ -20,6 +22,8 @@ class WebTools:
         response = urllib.request.urlopen(url, post_data)
         retval = {}
         retval['response'] = response.read()
-        if response.getcode() == expected_response:
+        retval['status'] = response.getcode()
+        retval['success'] = False
+        if retval['status'] == expected_response:
             retval['success'] = True
         return retval
