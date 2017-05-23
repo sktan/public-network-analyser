@@ -88,6 +88,8 @@ def main(args=None):
         print("Network stats incomplete due to captive portal requirement.")
     print("JSON Output:")
     # prints some pretty json output :D
+    # We should be able to submit this output to a website for
+    # pretty display of the collected data
     print(json.dumps(network_stats, indent=4, sort_keys=True))
 
 if __name__ == "__main__":
