@@ -15,7 +15,9 @@ class NetRecon:
         # and then returns the IP address that was used to connect
         sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
         sock.connect(("8.8.8.8", 80))
-        return sock.getsockname()[0]
+        out_ip = sock.getsockname()[0]
+        sock.close()
+        return out_ip
     @staticmethod
     def ping_subnet():
         """ Pings an entire subnet of IP addresses """
@@ -48,5 +50,21 @@ class NetRecon:
         request = WebTools.get(url, expected_response=204)
         return request['status'] != 204
     @staticmethod
-    def check_openvpn():
+    def check_openvpn(ip_addr, port=1194):
         """ Determine if port 1194 UDP is allowed for OpenVPN connections """
+        sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
+        sock.settimeout(10)
+        sock.connect((ip_addr, port))
+        # Send TLS initialisation command
+        # https://serverfault.com/a/470065
+        # equivilent to echo -e "\x38\x01\x00\x00\x00\x00\x00\x00\x00" |
+        # timeout 10 nc -u openvpnserver.com 1194 | cat -v
+        send_data = bytes([0x38, 0x01, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00])
+        sock.send(send_data)
+        retval = True
+        try:
+            data = str(sock.recv(100))
+        except:
+            retval = False
+        sock.close()
+        return retval

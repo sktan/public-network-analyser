@@ -6,6 +6,8 @@ from libs.netrecon import NetRecon
 # pip install pyspeedtest
 import pyspeedtest
 
+# Allows us to utilise a global config file
+# recon.ini
 config = configparser.ConfigParser() # pylint: disable=invalid-name
 config.read('recon.ini')
 
@@ -58,6 +60,15 @@ def requires_captive_portal():
     print("Captive portal: {0}".format(cap_por_required))
     return cap_por_required
 
+def check_openvpn():
+    """ Sends a test UDP packet to an OpenVPN server """
+    ovpn_result = NetRecon.check_openvpn(
+        config['openvpn']['host'],
+        port=int(config['openvpn']['port'])
+        )
+    print("OpenVPN connectivitiy: {0}".format(ovpn_result))
+    return ovpn_result
+
 def main(args=None):
     """ The entry point of our script."""
     if args is None:
@@ -70,6 +81,7 @@ def main(args=None):
     network_stats['captive_portal_required'] = cap_required
     if not cap_required:
         network_stats['internet_speeds'] = speedtest()
+        network_stats['openvpn_allowed'] = check_openvpn()
     else:
         print("Captive portal required, please login before proceeding.")
         print("Network stats incomplete due to captive portal requirement.")
