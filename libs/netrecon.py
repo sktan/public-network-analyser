@@ -59,8 +59,7 @@ class NetRecon:
         # https://serverfault.com/a/470065
         # equivilent to echo -e "\x38\x01\x00\x00\x00\x00\x00\x00\x00" |
         # timeout 10 nc -u openvpnserver.com 1194 | cat -v
-        send_data = bytes([0x38, 0x01, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00])
-        sock.send(send_data)
+        sock.send(bytes([0x38, 0x01, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00]))
         retval = True
         try:
             data = str(sock.recv(100))
