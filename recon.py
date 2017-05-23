@@ -1,9 +1,13 @@
 """ Performs reconnaissance on current networks  """
 import sys
 import platform
+import configparser
 from libs.netrecon import NetRecon
 # pip install pyspeedtest
 import pyspeedtest
+
+config = configparser.ConfigParser() # pylint: disable=invalid-name
+config.read('recon.ini')
 
 def operating_system():
     """ Prints the OS to the console """
@@ -11,7 +15,7 @@ def operating_system():
     print("Current Operating System: %s" % os_string)
     return os_string
 
-def network_interface():
+def network_interfaces():
     """ Grabs the network interface information """
     net_out_ip = NetRecon.out_interface()
     ext_ip = NetRecon.get_external_ip()
@@ -26,9 +30,17 @@ def network_interface():
 def speedtest():
     """ Runs a internet speedtest """
     net_speed = pyspeedtest.SpeedTest()
-    print("Ping: {0}".format(int(net_speed.ping())))
-    print("Download Speed: {0}".format(format_network_speed(net_speed.download())))
-    print("Upload Speed: {0}".format(format_network_speed(net_speed.upload())))
+    ping = net_speed.ping()
+    download = net_speed.download()
+    upload = net_speed.upload()
+    print("Ping: {0}".format(int(ping)))
+    print("Download Speed: {0}".format(format_network_speed(download)))
+    print("Upload Speed: {0}".format(format_network_speed(upload)))
+    return {
+        'ping': ping,
+        'download': download,
+        'upload': upload
+    }
 
 def format_network_speed(raw_bps=0):
     """ Formats a network speed test to human readable format """
@@ -44,6 +56,7 @@ def requires_captive_portal():
     """ Determines whether a captive portal is required for this network """
     cap_por_required = NetRecon.captive_portal_required()
     print("Captive portal: {0}".format(cap_por_required))
+    return cap_por_required
 
 def main(args=None):
     """ The entry point of our script."""
@@ -51,10 +64,17 @@ def main(args=None):
         args = sys.argv[1:]
 
     network_stats = {}
-    operating_system()
-    network_interface()
-    requires_captive_portal()
-    speedtest()
+    network_stats['os'] = operating_system()
+    network_stats['network_interfaces'] = network_interfaces()
+    cap_required = requires_captive_portal()
+    network_stats['captive_portal_required'] = cap_required
+    if not cap_required:
+        network_stats['internet_speeds'] = speedtest()
+    else:
+        print("Captive portal required, please login before proceeding.")
+        print("Network stats incomplete due to captive portal requirement.")
+    print("JSON Output:")
+    print(network_stats)
 
 if __name__ == "__main__":
     main()

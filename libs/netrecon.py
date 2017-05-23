@@ -25,6 +25,7 @@ class NetRecon:
         address = ""
         try:
             # We will first use the OpenDNS DNS server to grab our public IP
+            # Basically the equivilent to dig +short myip.opendns.com @resolver1.opendns.com
             my_resolver = dns.resolver.Resolver()
             my_resolver.timeout = 1
             my_resolver.lifetime = 1
@@ -46,3 +47,6 @@ class NetRecon:
         # https://www.chromium.org/chromium-os/chromiumos-design-docs/network-portal-detection
         request = WebTools.get(url, expected_response=204)
         return request['status'] != 204
+    @staticmethod
+    def check_openvpn():
+        """ Determine if port 1194 UDP is allowed for OpenVPN connections """
