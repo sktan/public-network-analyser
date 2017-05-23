@@ -2,6 +2,7 @@
 import sys
 import platform
 import configparser
+import json
 from libs.netrecon import NetRecon
 # pip install pyspeedtest
 import pyspeedtest
@@ -86,7 +87,8 @@ def main(args=None):
         print("Captive portal required, please login before proceeding.")
         print("Network stats incomplete due to captive portal requirement.")
     print("JSON Output:")
-    print(network_stats)
+    # prints some pretty json output :D
+    print(json.dumps(network_stats, indent=4, sort_keys=True))
 
 if __name__ == "__main__":
     main()
