@@ -32,7 +32,11 @@ def network_interfaces():
 
 def resolve_router():
     """ Attempts to resolve the router manufacturer """
-    return NetRecon.resolve_router()
+    router = NetRecon.resolve_router()
+    print("Router Vendor: {0}".format(router))
+    if router is "Unknown":
+        print("Root privilages is required to get router vendor")
+    return router
 
 def speedtest():
     """ Runs a internet speedtest """
