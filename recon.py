@@ -30,6 +30,10 @@ def network_interfaces():
         'internal_ip': net_out_ip
     }
 
+def resolve_router():
+    """ Attempts to resolve the router manufacturer """
+    return NetRecon.resolve_router()
+
 def speedtest():
     """ Runs a internet speedtest """
     net_speed = pyspeedtest.SpeedTest()
@@ -75,8 +79,12 @@ def main(args=None):
     if args is None:
         args = sys.argv[1:]
 
+    resolve_router()
+
     network_stats = {}
+    network_stats['version'] = '2017-05-11'
     network_stats['os'] = operating_system()
+    network_stats['router'] = str(resolve_router())
     network_stats['network_interfaces'] = network_interfaces()
     cap_required = requires_captive_portal()
     network_stats['captive_portal_required'] = cap_required
@@ -86,6 +94,9 @@ def main(args=None):
     else:
         print("Captive portal required, please login before proceeding.")
         print("Network stats incomplete due to captive portal requirement.")
+        print("Use the command python recon.py CAP_PORTAL afterwards.")
+
+    network_stats['captive_portal_required'] = 'CAP_PORTAL' in sys.argv
     print("JSON Output:")
     # prints some pretty json output :D
     # We should be able to submit this output to a website for

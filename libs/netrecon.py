@@ -1,8 +1,13 @@
 """ Class for network functions """
 # pylint: disable=W0702
+import sys
 import socket
+from subprocess import check_output
+import re
 # pip install dnspython
 import dns.resolver
+# pip install netifaces
+import netifaces
 from libs.webtools import WebTools
 
 class NetRecon:
@@ -68,3 +73,14 @@ class NetRecon:
             retval = False
         sock.close()
         return retval
+    @staticmethod
+    def resolve_router():
+        """ Attempts to determine the router model """
+        gws = netifaces.gateways()
+        gateway_ip = gws['default'][netifaces.AF_INET][0]
+        output = check_output(["nmap", "-sP", "-n", gateway_ip]).decode(sys.stdout.encoding)
+        regmatch = re.compile("MAC Address: ([0-9A-F:]+) ((.*))", re.MULTILINE)
+        matches = regmatch.findall(output)
+        if matches is None or len(matches) > 0:
+            return matches[0][1]
+        return "Unknown"
