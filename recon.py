@@ -3,7 +3,9 @@ import sys
 import platform
 import configparser
 import json
+import hashlib
 from libs.netrecon import NetRecon
+from libs.webtools import WebTools
 # pip install pyspeedtest
 import pyspeedtest
 
@@ -37,6 +39,19 @@ def resolve_router():
     if router is "Unknown":
         print("Root privilages is required to get router vendor")
     return router
+
+def test_dns():
+    """ Does a DNS test that only opendns can resolve """
+    dns_result = NetRecon.resolve_dns('myip.opendns.com.')
+    print("DNS Result: {0}".format(dns_result))
+    return dns_result
+
+def mtfw_test():
+    """ GETs the "mother fucking website" page and hashes it """
+    mtfw_hash = hashlib.new("sha256")
+    mtfw_hash.update(WebTools.get("http://motherfuckingwebsite.com")['response'])
+    mtfw_hash = mtfw_hash.hexdigest()
+    return mtfw_hash
 
 def speedtest():
     """ Runs a internet speedtest """
@@ -83,12 +98,16 @@ def main(args=None):
     if args is None:
         args = sys.argv[1:]
 
-    resolve_router()
-
     network_stats = {}
+
     network_stats['version'] = '2017-05-11'
     network_stats['os'] = operating_system()
     network_stats['router'] = str(resolve_router())
+    if test_dns() is None:
+        network_stats['dns_test'] = False
+    else:
+        network_stats['dns_test'] = True
+    network_stats['mtfw_hash'] = mtfw_test()
     network_stats['network_interfaces'] = network_interfaces()
     cap_required = requires_captive_portal()
     network_stats['captive_portal_required'] = cap_required

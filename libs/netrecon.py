@@ -84,3 +84,19 @@ class NetRecon:
         if matches is None or len(matches) > 0:
             return matches[0][1]
         return "Unknown"
+    @staticmethod
+    def resolve_dns(domain, dns_server='208.67.222.222'):
+        """ Resolves an address by usng a 3rd party DNS provider """
+        address = ""
+        try:
+            # We will first use the OpenDNS DNS server to grab our public IP
+            # Basically the equivilent to dig +short myip.opendns.com @resolver1.opendns.com
+            my_resolver = dns.resolver.Resolver()
+            my_resolver.timeout = 1
+            my_resolver.lifetime = 1
+            my_resolver.nameservers = [dns_server]
+            answer = my_resolver.query(domain)
+            address = answer[0].address
+        except:
+            return None
+        return address
